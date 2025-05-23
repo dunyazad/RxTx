@@ -6,6 +6,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <winsock2.h>
+#define NOMINMAX
 #include <windows.h>
 
 #ifdef LIBRXTX_EXPORTS
@@ -16,10 +17,11 @@
 
 class LIBRXTX_API IRxTx {
 public:
+    virtual ~IRxTx() = default;
     virtual void DoSomething() = 0;
     virtual void StartServer(int port = 9000) = 0;
-    virtual void StartClient(const std::string& address = "localhost", int port = 9000) = 0; // Ãß°¡
-    virtual ~IRxTx() = default;
+    virtual void StartClient(const std::string& address = "localhost", int port = 9000) = 0;
+    virtual bool SendToClients(const std::string& msg) = 0;
 };
 
 extern "C" {
