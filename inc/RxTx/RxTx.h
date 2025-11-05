@@ -31,6 +31,7 @@ namespace libRxTx {
         ~RxTx();
 
         bool Init();
+        std::string GetLocalIP();
         bool Bind(int port, const std::string& localIp = "");
         bool Listen(int backlog = 5);
         bool Connect(const std::string& host, int port);

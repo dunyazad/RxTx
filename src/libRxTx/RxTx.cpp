@@ -21,15 +21,40 @@ namespace libRxTx {
         return true;
     }
 
+    std::string RxTx::GetLocalIP()
+    {
+        char hostname[256];
+        gethostname(hostname, sizeof(hostname));
+        addrinfo hints{}, * info = nullptr;
+        hints.ai_family = AF_INET;
+        getaddrinfo(hostname, nullptr, &hints, &info);
+        char ip[INET_ADDRSTRLEN];
+        sockaddr_in* addr = (sockaddr_in*)info->ai_addr;
+        inet_ntop(AF_INET, &addr->sin_addr, ip, sizeof(ip));
+        freeaddrinfo(info);
+        return ip;
+    }
+
     bool RxTx::Bind(int port, const std::string& localIp) {
         addr_.sin_family = AF_INET;
         addr_.sin_port = htons(port);
         addr_.sin_addr.s_addr = localIp.empty() ? INADDR_ANY : inet_addr(localIp.c_str());
         localInterfaceIp_ = localIp;
 
+        BOOL reuse = TRUE;
+        setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse));
+
         if (bind(sock_, (sockaddr*)&addr_, sizeof(addr_)) == SOCKET_ERROR) {
             std::cerr << "RxTx: bind failed\n";
             return false;
+        }
+
+        // 실제 바인딩된 포트를 얻기
+        if (port == 0) {
+            sockaddr_in actual{};
+            socklen_t len = sizeof(actual);
+            if (getsockname(sock_, (sockaddr*)&actual, &len) == 0)
+                port = ntohs(actual.sin_port);
         }
 
         // Broadcast 옵션
