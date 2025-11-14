@@ -69,7 +69,6 @@ namespace libRxTx {
 
         void JoinMulticastGroup(const std::string& groupAddr);
         void LeaveMulticastGroup(const std::string& groupAddr);
-        std::string GetLocalIP();
         void RegisterClientSocket(const std::string& clientId, const std::string& ip);
         void MapClientIpToId(const std::string& ip, const std::string& id);
         std::string GetMappedClientId(const std::string& ip);
